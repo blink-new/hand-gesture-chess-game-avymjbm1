@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Chess } from 'chess.js';
 import { GameState, ChessSquare, PieceColor } from '../types/chess';
 
@@ -16,9 +16,9 @@ export const useChessGame = () => {
 
   const [isAiThinking, setIsAiThinking] = useState(false);
 
-  // Convert chess.js board to our format
-  const updateBoard = useCallback((selectedSquare: string | null, validMoves: string[]) => {
-    const board: ChessSquare[][] = [];
+  // Convert chess.js board to our format - memoized to prevent infinite loops
+  const board = useMemo(() => {
+    const boardArray: ChessSquare[][] = [];
     
     for (let rank = 7; rank >= 0; rank--) {
       const row: ChessSquare[] = [];
@@ -29,16 +29,16 @@ export const useChessGame = () => {
         row.push({
           piece: piece ? { type: piece.type, color: piece.color } : null,
           square,
-          isSelected: selectedSquare === square,
-          isValidMove: validMoves.includes(square),
-          isValidCapture: validMoves.includes(square) && piece !== null
+          isSelected: gameState.selectedSquare === square,
+          isValidMove: gameState.validMoves.includes(square),
+          isValidCapture: gameState.validMoves.includes(square) && piece !== null
         });
       }
-      board.push(row);
+      boardArray.push(row);
     }
     
-    return board;
-  }, [chess]);
+    return boardArray;
+  }, [chess, gameState.selectedSquare, gameState.validMoves]);
 
   // Get valid moves for a square
   const getValidMoves = useCallback((square: string): string[] => {
@@ -217,13 +217,8 @@ export const useChessGame = () => {
     setGameState(prev => ({ ...prev, difficulty }));
   }, []);
 
-  // Update board when game state changes
-  useEffect(() => {
-    setGameState(prev => ({ ...prev, board: updateBoard(prev.selectedSquare, prev.validMoves) }));
-  }, [updateBoard, gameState.selectedSquare, gameState.validMoves]);
-
   return {
-    gameState: { ...gameState, board: updateBoard(gameState.selectedSquare, gameState.validMoves) },
+    gameState: { ...gameState, board },
     selectSquare,
     resetGame,
     setDifficulty,

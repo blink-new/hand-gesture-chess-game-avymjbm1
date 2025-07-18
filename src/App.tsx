@@ -17,12 +17,9 @@ function App() {
     if (gestureState.isPinching && !lastPinchState && gestureState.confidence > 0.7) {
       if (gameState.selectedSquare) {
         // If a piece is already selected, this is a drop gesture
-        // For now, we'll just deselect - in a real implementation, 
-        // you'd track cursor position to determine drop location
         console.log('Drop gesture detected');
       } else {
-        // This is a pick gesture - select the piece under cursor
-        // For demo purposes, we'll select a random white piece
+        // This is a pick gesture - select a random white piece for demo
         const whitePieces = gameState.board.flat().filter(
           square => square.piece && square.piece.color === 'w'
         );
@@ -47,7 +44,7 @@ function App() {
     }
 
     setLastPinchState(gestureState.isPinching);
-  }, [gestureState.isPinching, gestureState.confidence, lastPinchState, gameState.selectedSquare, gameState.validMoves, selectedByGesture, selectSquare, gameState.board]);
+  }, [gestureState.isPinching, gestureState.confidence, lastPinchState, gameState.selectedSquare, gameState.board, gameState.validMoves, selectedByGesture, selectSquare]);
 
   const handleGestureChange = (isPinching: boolean, confidence: number) => {
     setGestureState({ isPinching, confidence });

@@ -17,39 +17,39 @@ export const useChessGame = () => {
   const [isAiThinking, setIsAiThinking] = useState(false);
 
   // Convert chess.js board to our format
-  const updateBoard = useCallback(() => {
+  const updateBoard = useCallback((selectedSquare: string | null, validMoves: string[]) => {
     const board: ChessSquare[][] = [];
     
     for (let rank = 7; rank >= 0; rank--) {
       const row: ChessSquare[] = [];
       for (let file = 0; file < 8; file++) {
         const square = String.fromCharCode(97 + file) + (rank + 1);
-        const piece = chess.get(square as any);
+        const piece = chess.get(square);
         
         row.push({
           piece: piece ? { type: piece.type, color: piece.color } : null,
           square,
-          isSelected: gameState.selectedSquare === square,
-          isValidMove: gameState.validMoves.includes(square),
-          isValidCapture: gameState.validMoves.includes(square) && piece !== null
+          isSelected: selectedSquare === square,
+          isValidMove: validMoves.includes(square),
+          isValidCapture: validMoves.includes(square) && piece !== null
         });
       }
       board.push(row);
     }
     
     return board;
-  }, [chess, gameState.selectedSquare, gameState.validMoves]);
+  }, [chess]);
 
   // Get valid moves for a square
   const getValidMoves = useCallback((square: string): string[] => {
-    const moves = chess.moves({ square: square as any, verbose: true });
+    const moves = chess.moves({ square, verbose: true });
     return moves.map(move => move.to);
   }, [chess]);
 
   // Make a move
   const makeMove = useCallback((from: string, to: string): boolean => {
     try {
-      const move = chess.move({ from: from as any, to: to as any });
+      const move = chess.move({ from, to });
       if (move) {
         setGameState(prev => ({
           ...prev,
@@ -186,7 +186,7 @@ export const useChessGame = () => {
       }
     } else {
       // Select new square
-      const piece = chess.get(square as any);
+      const piece = chess.get(square);
       if (piece && piece.color === 'w') {
         const validMoves = getValidMoves(square);
         setGameState(prev => ({
@@ -219,11 +219,11 @@ export const useChessGame = () => {
 
   // Update board when game state changes
   useEffect(() => {
-    setGameState(prev => ({ ...prev, board: updateBoard() }));
-  }, [updateBoard]);
+    setGameState(prev => ({ ...prev, board: updateBoard(prev.selectedSquare, prev.validMoves) }));
+  }, [updateBoard, gameState.selectedSquare, gameState.validMoves]);
 
   return {
-    gameState: { ...gameState, board: updateBoard() },
+    gameState: { ...gameState, board: updateBoard(gameState.selectedSquare, gameState.validMoves) },
     selectSquare,
     resetGame,
     setDifficulty,

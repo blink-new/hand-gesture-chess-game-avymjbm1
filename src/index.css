@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 6%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 258 90% 66%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 43 96% 56%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 258 90% 66%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+
+    font-family: Inter, sans-serif;
+  }
+}
+
+@layer components {
+  .chess-square {
+    @apply relative flex items-center justify-center transition-all duration-200;
+  }
+  
+  .chess-square.light {
+    @apply bg-amber-100;
+  }
+  
+  .chess-square.dark {
+    @apply bg-amber-800;
+  }
+  
+  .chess-square.selected {
+    @apply ring-4 ring-primary ring-opacity-60;
+  }
+  
+  .chess-square.valid-move {
+    @apply after:absolute after:w-4 after:h-4 after:bg-accent after:rounded-full after:opacity-80;
+  }
+  
+  .chess-square.valid-capture {
+    @apply ring-4 ring-red-500 ring-opacity-60;
+  }
+  
+  .chess-piece {
+    @apply text-4xl cursor-pointer transition-all duration-200 hover:scale-110 select-none;
+
+    filter: drop-shadow(2px 2px 4px rgb(0 0 0 / 30%));
+  }
+  
+  .chess-piece.dragging {
+    @apply scale-125 z-50;
+  }
+  
+  .gesture-indicator {
+    @apply w-4 h-4 rounded-full transition-all duration-200;
+  }
+  
+  .gesture-indicator.pinch {
+    @apply bg-green-500 animate-pulse;
+  }
+  
+  .gesture-indicator.open {
+    @apply bg-blue-500;
+  }
+  
+  .gesture-indicator.none {
+    @apply bg-gray-500;
+  }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgb(168 85 247 / 40%); }
+  50% { box-shadow: 0 0 30px rgb(168 85 247 / 80%); }
+}
+
+.glow-animation {
+  animation: glow 2s ease-in-out infinite;
+}
